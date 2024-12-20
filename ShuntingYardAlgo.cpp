@@ -12,7 +12,7 @@ int precedence(string s)
         return 2;
     }
     if(s == "+" || s == "-")
-    {
+    {  
         return 1;
     }
 
@@ -32,7 +32,25 @@ queue<string> postfix(vector<string> vec)
         }
         else
         {
-            if(st.empty() || precedence(vec[i]) > precedence(st.top())) st.push(vec[i]);
+            if(vec[i] == "(")
+            {
+                st.push(vec[i]);
+            }   
+
+            else if(vec[i] == ")")
+            {
+                while(st.top() != "(")
+                {
+                    q.push(st.top());
+                    st.pop();
+                }
+                st.pop();
+            }
+
+            else if(st.empty() || precedence(vec[i]) > precedence(st.top())) 
+            {
+                st.push(vec[i]);   
+            }
 
             else
             {
@@ -49,26 +67,71 @@ queue<string> postfix(vector<string> vec)
         
     }
 
-    //for test na kub :)))
-    stack<string> s_test = st;
-    queue<string> q_test = q;
-    cout << "stack: ";
-    while (!s_test.empty())
+    while(!st.empty())
     {
-        cout << s_test.top() << " ";
-        s_test.pop();
+        q.push(st.top());
+        st.pop();
     }
-    cout << endl;
-    cout << "queue: ";
-    while (!q_test.empty())
-    {
-        cout << q_test.front() << " ";
-        q_test.pop();
-    }
-    cout << endl;
+    // //for test na kub :)))
+    // stack<string> s_test = st;
+    // queue<string> q_test = q;
+    // cout << "stack: ";
+    // while (!s_test.empty())
+    // {
+    //     cout << s_test.top() << " ";
+    //     s_test.pop();
+    // }
+    // cout << endl;
+    // cout << "queue: ";
+    // while (!q_test.empty())
+    // {
+    //     cout << q_test.front() << " ";
+    //     q_test.pop();
+    // }
+    // cout << endl;
 
 
     return q;
+}
+
+int RPN(queue<string> q)
+{
+    stack<int> st;
+
+    while(!q.empty())
+    {
+        if(isdigit(q.front()[0]))
+        {
+            st.push(stoi(q.front()));
+        }
+        else
+        {
+            int numtwo = st.top();
+            st.pop();
+            int numone = st.top();
+            st.pop();
+
+            if(q.front() == "+")
+            {
+                st.push(numone + numtwo);
+            }
+            else if(q.front() == "-")
+            {
+                st.push(numone - numtwo);
+            }
+            else if(q.front() == "*")
+            {
+                st.push(numone * numtwo);
+            }
+            else if(q.front() == "/")
+            {
+                st.push(numone / numtwo);
+            }
+        }
+        q.pop();
+    }
+
+    return st.top();
 }
 
 int main()
@@ -85,10 +148,8 @@ int main()
     }
 
     auto q = postfix(tokens);
-    // while (!q.empty())
-    // {
-    //     cout << q.front() << "\n";
-    //     q.pop();
-    // }
+
+    cout << RPN(q) << "\n";
+
     return 0;
 }
